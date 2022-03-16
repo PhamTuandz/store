@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import "antd/dist/antd.css";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "./module/firebase.config";
 import { getDatabase, ref, onValue } from "firebase/database";
 import Products from "./containers/Products";
@@ -17,25 +17,35 @@ export interface ITutorialData {
 }
 
 function App() {
-  const starCountRef = ref(db, "store/");
-
   const [store, setStore] = useState<any>([]);
-
-  const notify = () => toast("Wow so easy!");
+  const [options, setOptions] = useState<any>([]);
 
   useEffect(() => {
-    onValue(starCountRef, (snapshot) => {
+    onValue(ref(db, "store/"), (snapshot) => {
       const storeFirebase: any[] = snapshot.val();
-      setStore(Object.values(storeFirebase));
+      setStore(
+        storeFirebase && storeFirebase.length
+          ? Object.entries(storeFirebase)?.map(([key, item]) => {
+              return { ...item, title: key };
+            })
+          : []
+      );
+    });
+    onValue(ref(db, "types/"), (snaphost) => {
+      const typesFirebase: any[] = snaphost.val();
+      setOptions(
+        Object.entries(typesFirebase)?.map(([key, item]) => {
+          return { value: key, title: item };
+        })
+      );
     });
   }, []);
 
   return (
     <div className="App">
-      <button onClick={notify}>Notify!</button>
       <ToastContainer
         position="top-right"
-        autoClose={5000}
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -44,7 +54,7 @@ function App() {
         draggable
         pauseOnHover
       />
-      <Products store={store} />
+      <Products store={store} options={options} />
     </div>
   );
 }

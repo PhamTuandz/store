@@ -1,19 +1,16 @@
-import { initializeApp } from "firebase/app"
+import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 const firebaseConfig = {
-  apiKey: "AIzaSyCxbrZp7SU9Pm6bhX1zF6C5aVR3K01Z_WY",
-  authDomain: "store-74355.firebaseapp.com",
-  databaseURL:
-    "https://store-74355-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "store-74355",
-  storageBucket: "store-74355.appspot.com",
-  messagingSenderId: "399301337826",
-  appId: "1:399301337826:web:433665be8618bb21a6b4bb",
-  measurementId: "G-3WW3744854",
+  apiKey: "AIzaSyA7qy9HRxfVVFMctiUEeEeEZ2uvNzUXZsE",
+  authDomain: "store-8a88e.firebaseapp.com",
+  projectId: "store-8a88e",
+  storageBucket: "store-8a88e.appspot.com",
+  messagingSenderId: "925772699637",
+  appId: "1:925772699637:web:6338f0d35c40a6d39772bc",
+  measurementId: "G-982RCRWJBB",
 };
 
-const app = initializeApp(firebaseConfig)
-const db = getDatabase(app)
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-
-export {db}
+export { db };

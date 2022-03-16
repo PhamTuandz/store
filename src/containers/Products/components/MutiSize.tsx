@@ -1,17 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Tooltip } from "@mui/material";
 import React from "react";
 import InputSize from "./InputSize";
 import AddIcon from "@mui/icons-material/Add";
-import { Button } from "antd";
+import { Button, Input } from "antd";
 
 interface IMutiSize {
-  infor: any;
-  size?: any;
-  setSize?: any;
-  number?: any;
-  setNumber?: any;
-  colors: any;
-  setColors: any;
+  infors?: any;
+  index?: any;
+  id?: any;
+  onChangeSize?: any;
+  onChangeNumber?: any;
 }
 
 interface IInfor {
@@ -26,54 +25,34 @@ interface IColors {
   isShow: boolean;
 }
 export default function MutiSize({
-  size,
-  setSize,
-  number,
-  setNumber,
-  infor,
-  colors,
-  setColors,
+  infors,
+  index,
+  id,
+  onChangeSize,
+  onChangeNumber,
 }: IMutiSize) {
-  console.log("Infor", infor);
-  const onChangeSize = (size: any, index: any) => {
-    setSize((pre: any) => []);
-  };
-
-  const handleClickAddInfor = (val: IColors) => {
-    setColors(
-      colors.map((item: IColors) => {
-        if (item.id === val.id) {
-          return {
-            ...item,
-            infors: [...item.infors, { size: "", number: "" }],
-          };
-        }
-        return { ...item };
-      })
-    );
-  };
-
-  const addSizes = () => {
-    //   setColors((pre: any) =>  {...pre})
-  };
+  const { size, number } = infors;
   return (
     <React.Fragment>
-      {infor &&
-        infor.length &&
-        infor.map((item: any, index: number) => {
-          <InputSize />;
-        })}
-      <div className="col-md-12 d-flex justify-content-center">
-        <Tooltip title="Thêm thông tin" enterDelay={500} leaveDelay={200}>
-          <Button
-            style={{ marginTop: "34px" }}
-            shape="circle"
-            icon={<AddIcon />}
-            onClick={() => {
-              //   handleClickAddInfor(item);
-            }}
-          />
-        </Tooltip>
+      <div className="col-md-6">
+        <Input
+          size="large"
+          value={size}
+          placeholder="Nhập màu"
+          style={{ marginTop: infors.id !== 1 ? "5px" : "0px" }}
+          prefix={<span>Size:</span>}
+          onChange={(e) => onChangeSize(e.target.value, index, id, infors.id)}
+        />
+      </div>
+      <div className="col-md-6">
+        <Input
+          size="large"
+          value={number}
+          placeholder="Nhập màu"
+          style={{ marginTop: infors.id !== 1 ? "5px" : "0px" }}
+          prefix={<span>SL:</span>}
+          onChange={(e) => onChangeNumber(e.target.value, index, id, infors.id)}
+        />
       </div>
     </React.Fragment>
   );

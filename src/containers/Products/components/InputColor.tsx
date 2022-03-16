@@ -1,3 +1,4 @@
+import { Input } from "antd";
 import React from "react";
 
 interface IInputColor {
@@ -13,12 +14,13 @@ export default function InputColor({
   onKeyPress,
 }: IInputColor) {
   return (
-    <input
-      type="text"
+    <Input
+      size="large"
       value={color}
-      onChange={(e) => onChange(e.target.value, index)}
-      className="form-control"
       placeholder="Nhập màu"
+      style={{ marginTop: index !== 0 ? "5px" : "0px" }}
+      prefix={<span>Nhập màu:</span>}
+      onChange={(e) => onChange(e.target.value, index)}
       onKeyPress={onKeyPress}
     />
   );

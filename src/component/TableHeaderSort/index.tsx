@@ -49,6 +49,7 @@ export default function TableHeaderSort(props: IProps) {
                 position: "sticky",
                 left: 0,
                 zIndex: 20,
+                fontWeight: "bold",
               }}
             >
               {isNaN(col.id) ? (
@@ -85,6 +86,7 @@ export default function TableHeaderSort(props: IProps) {
                 position: "sticky",
                 left: 0,
                 zIndex: 20,
+                fontWeight: "bold",
               }}
             ></TableCell>
           );
@@ -101,6 +103,7 @@ export default function TableHeaderSort(props: IProps) {
                 position: "sticky",
                 left: 0,
                 zIndex: 20,
+                fontWeight: "bold",
               }}
             >
               {col.label}
@@ -116,6 +119,7 @@ export default function TableHeaderSort(props: IProps) {
                 textAlign: "center",
                 minWidth: col.minWidth,
                 padding: "16px",
+                fontWeight: "bold",
               }}
             >
               {isNaN(col.id) ? (

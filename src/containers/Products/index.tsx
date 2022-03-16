@@ -30,6 +30,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { getDatabase, ref, remove, set } from "firebase/database";
 import ModalConfirm from "../../component/ModalConfirm";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import { toast } from "react-toastify";
 
 export const useStyles = makeStyles({
   root: {
@@ -62,7 +63,8 @@ export const useStyles = makeStyles({
   },
 });
 
-export default function Products({ store }: any) {
+export default function Products({ store, options }: any) {
+  console.log(store);
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("no");
@@ -117,7 +119,6 @@ export default function Products({ store }: any) {
   //     );
   //   }
   // }, [products]);
-
   const renderControl = () => {
     return (
       <div className="container">
@@ -159,9 +160,9 @@ export default function Products({ store }: any) {
   };
 
   const handleRemove = (value: any) => {
-    console.log(value);
     setIsOpenConfirm(!isOpenConfirm);
     setValues(value);
+    console.log(value);
   };
   console.log(products);
   const renderTable = () => {
@@ -172,190 +173,181 @@ export default function Products({ store }: any) {
       );
       return tableData.map((row, idx) => {
         return (
-          <React.Fragment>
-            <TableRow
-              sx={{ "& > *": { borderBottom: "unset" } }}
-              key={idx}
-              onClick={() => setOpen(!open)}
-            >
-              {ColumnList.map((col) => {
-                const colId = col.id;
-                const value = row[colId];
+          <TableRow
+            sx={{ "& > *": { borderBottom: "unset" } }}
+            key={idx}
+            onClick={() => setOpen(!open)}
+          >
+            {ColumnList.map((col) => {
+              const colId = col.id;
+              const value = row[colId];
 
-                if (colId === "no") {
-                  return <TableCell key={colId}>{idx + 1}</TableCell>;
-                } else if (colId === "types") {
-                  if (value === "shirt") {
-                    return (
-                      <TableCell
-                        key={colId}
-                        style={{ textAlign: "center", fontWeight: "600" }}
-                      >
-                        Áo
-                      </TableCell>
-                    );
-                  } else if (value === "trousers") {
-                    return (
-                      <TableCell
-                        key={colId}
-                        style={{ textAlign: "center", fontWeight: "600" }}
-                      >
-                        Quần
-                      </TableCell>
-                    );
-                  }
-                } else if (colId === "amount_remaining") {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
-                    >
-                      {row.number_import && row.number_export
-                        ? AppHelpers.amountRemaining(
-                            row.number_import,
-                            row.number_export
-                          )
-                        : "0"}
-                    </TableCell>
-                  );
-                } else if (
-                  colId === "number_import" ||
-                  colId === "number_export"
-                ) {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
-                    >
-                      {value ? `${value}` : "0"}
-                    </TableCell>
-                  );
-                } else if (
-                  colId === "price_import" ||
-                  colId === "price_export"
-                ) {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
-                    >
-                      {value ? (
-                        <NumberFormat
-                          value={value}
-                          displayType={"text"}
-                          thousandSeparator={true}
-                          suffix={" ₫"}
-                        />
-                      ) : (
-                        "0 ₫"
-                      )}
-                    </TableCell>
-                  );
-                } else if (colId === "total_import") {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
-                    >
+              if (colId === "no") {
+                return <TableCell key={colId}>{idx + 1}</TableCell>;
+              } else if (colId === "types") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    {value
+                      ? AppHelpers.titleProduct(options, value)?.title
+                      : "-"}
+                  </TableCell>
+                );
+              } else if (colId === "amount_remaining") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    {row.number_import && row.number_export
+                      ? AppHelpers.amountRemaining(
+                          row.number_import,
+                          row.number_export
+                        )
+                      : "0"}
+                  </TableCell>
+                );
+              } else if (
+                colId === "number_import" ||
+                colId === "number_export"
+              ) {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    {value ? `${value}` : "0"}
+                  </TableCell>
+                );
+              } else if (colId === "price_import" || colId === "price_export") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    {value ? (
                       <NumberFormat
-                        value={row.number_import * row.price_import}
+                        value={value}
                         displayType={"text"}
                         thousandSeparator={true}
                         suffix={" ₫"}
                       />
-                    </TableCell>
-                  );
-                } else if (colId === "total_export") {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
-                    >
-                      <NumberFormat
-                        value={row.number_export * row.price_export}
-                        displayType={"text"}
-                        thousandSeparator={true}
-                        suffix={" ₫"}
-                      />
-                    </TableCell>
-                  );
-                } else if (colId === "actions") {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
-                    >
-                      <Tooltip title="Bán" enterDelay={500} leaveDelay={200}>
-                        <button
-                          className="btn__action"
-                          style={{ color: "#3493e4" }}
-                        >
-                          <AddShoppingCartIcon />
-                        </button>
-                      </Tooltip>
-                      <Tooltip
-                        title="Xem chi tiết"
-                        enterDelay={500}
-                        leaveDelay={200}
+                    ) : (
+                      "0 ₫"
+                    )}
+                  </TableCell>
+                );
+              } else if (colId === "total_import") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    <NumberFormat
+                      value={row.number_import * row.price_import}
+                      displayType={"text"}
+                      thousandSeparator={true}
+                      suffix={" ₫"}
+                    />
+                  </TableCell>
+                );
+              } else if (colId === "total_export") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    <NumberFormat
+                      value={row.number_export * row.price_export}
+                      displayType={"text"}
+                      thousandSeparator={true}
+                      suffix={" ₫"}
+                    />
+                  </TableCell>
+                );
+              } else if (colId === "actions") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    <Tooltip title="Bán" enterDelay={500} leaveDelay={200}>
+                      <button
+                        className="btn__action"
+                        style={{ color: "#3493e4" }}
                       >
-                        <button
-                          className="btn__action"
-                          style={{ color: "rgb(61 166 65)" }}
-                        >
-                          <VisibilityIcon />
-                        </button>
-                      </Tooltip>
-                      <Tooltip
-                        title="Chỉnh sửa"
-                        enterDelay={500}
-                        leaveDelay={200}
-                      >
-                        <button
-                          className="btn__action"
-                          style={{ color: "#rgb(40 37 37)" }}
-                        >
-                          <EditIcon />
-                        </button>
-                      </Tooltip>
-                      <Tooltip title="Xóa" enterDelay={500} leaveDelay={200}>
-                        <button
-                          className="btn__action"
-                          style={{ color: "red" }}
-                          onClick={() => handleRemove(row)}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </button>
-                        {/* <ButtonAction
-                          color="#33CC99"
-                          onClick={(e) => handleOpenMenu(e, row)}
-                          className="btn mr-3"
-                        >
-                          <i className="far fa-sync"></i>
-                        </ButtonAction> */}
-                      </Tooltip>
-                    </TableCell>
-                  );
-                } else {
-                  return (
-                    <TableCell
-                      key={colId}
-                      style={{ textAlign: "center", fontWeight: "600" }}
+                        <AddShoppingCartIcon />
+                      </button>
+                    </Tooltip>
+                    <Tooltip
+                      title="Xem chi tiết"
+                      enterDelay={500}
+                      leaveDelay={200}
                     >
-                      {value ? value : "-"}
-                    </TableCell>
-                  );
-                }
-              })}
-            </TableRow>
-          </React.Fragment>
+                      <button
+                        className="btn__action"
+                        style={{ color: "rgb(61 166 65)" }}
+                      >
+                        <VisibilityIcon />
+                      </button>
+                    </Tooltip>
+                    <Tooltip
+                      title="Chỉnh sửa"
+                      enterDelay={500}
+                      leaveDelay={200}
+                    >
+                      <button
+                        className="btn__action"
+                        style={{ color: "#rgb(40 37 37)" }}
+                      >
+                        <EditIcon />
+                      </button>
+                    </Tooltip>
+                    <Tooltip title="Xóa" enterDelay={500} leaveDelay={200}>
+                      <button
+                        className="btn__action"
+                        style={{ color: "red" }}
+                        onClick={() => handleRemove(row)}
+                      >
+                        <DeleteOutlineOutlinedIcon />
+                      </button>
+                    </Tooltip>
+                  </TableCell>
+                );
+              } else {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    {value ? value : "-"}
+                  </TableCell>
+                );
+              }
+            })}
+          </TableRow>
         );
       });
+    } else {
+      return (
+        <TableRow>
+          <TableCell
+            className="w-100"
+            align="center"
+            colSpan={ColumnList.length}
+            style={{ fontWeight: "bold" }}
+          >
+            Không tìm thấy sản phẩm
+          </TableCell>
+        </TableRow>
+      );
     }
   };
-
   const handleRemoveProduct = () => {
-    remove(ref(db, "store/" + values.name_products)).then(() => {
-      console.log("remove success!");
+    remove(ref(db, "store/" + values.title)).then(() => {
+      toast.success("Xóa rồi đóa bẹn!");
     });
   };
   return (
@@ -433,6 +425,7 @@ export default function Products({ store }: any) {
         <ModalCreateProduct
           open={isOpenCreate}
           onClose={() => setIsOpenCreate(false)}
+          options={options}
         />
       )}
       {isOpenConfirm && (

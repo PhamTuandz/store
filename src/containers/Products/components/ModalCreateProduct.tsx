@@ -1,22 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { Dialog } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import { useForm } from "react-hook-form";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
 import AddIcon from "@mui/icons-material/Add";
-import { Button } from "antd";
+import { Button, Select } from "antd";
 import { Tooltip } from "@mui/material";
-import { spawn } from "child_process";
 import MutiColor from "./MutiColor";
 import { getDatabase, ref, set } from "firebase/database";
 import NumberFormat from "react-number-format";
+import { Input } from "antd";
+import { AppHelpers } from "../../../utils/helpers";
+import { toast } from "react-toastify";
+
 interface IProps {
   open: boolean;
   onClose: () => void;
+  options: any[];
 }
 
 interface IInfor {
@@ -30,38 +31,40 @@ interface IColors {
   infors: IInfor[];
   isShow: boolean;
 }
-export default function ModalCreateProduct({ open, onClose }: IProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    getValues,
-    control,
-  } = useForm();
+export default function ModalCreateProduct({ open, onClose, options }: IProps) {
+  const { handleSubmit } = useForm();
 
   const [colors, setColors] = React.useState<IColors | any>([
     {
       id: 1,
       name_color: "",
-      infors: [{ size: "", number: "" }],
+      infors: [{ id: 1, size: "", number: "" }],
       isShow: false,
     },
   ]);
+  const { Option } = Select;
 
-  const [colorName, setColorName] = React.useState<string>("");
+  const [productName, setProductName] = React.useState<string>("");
+  const [numberImport, setNumberImport] = useState<string>("");
   const [priceIn, setPriceIn] = useState<string>("");
   const [priceOut, setPriceOut] = useState<string>("");
-  const handleClickAddColor = () => {
+  const [selectOpt, setSelectOpt] = useState<any>(options[1]?.value);
+
+  const resetInput = () => {
+    setProductName("");
+    setNumberImport("");
+    setPriceIn("");
+    setSelectOpt(options[1]?.value);
     setColors([
-      ...colors,
       {
-        id: colors.length + 1,
+        id: 1,
         name_color: "",
-        infors: [{ size: "", number: "" }],
+        infors: [{ id: 1, size: "", number: "" }],
         isShow: false,
       },
     ]);
   };
+
   const handleClickAddInfor = (val: IColors) => {
     setColors(
       colors.map((item: IColors) => {
@@ -78,19 +81,19 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
 
   const onSubmit = (data: any) => {
     const db = getDatabase();
-    if (data.type === "shirt") {
-      set(ref(db, "store/" + data.name), {
-        name_products: data.name,
-        types: data.type,
-        number_export: 0,
-        number_import: data.number_import,
-        price_import: priceIn,
-        price_export: priceOut,
-        colors: colorInfor(colors),
-      });
-    }
+    set(ref(db, "store/" + productName + `_${AppHelpers.generateUUIDV4()}`), {
+      name_products: productName,
+      types: selectOpt,
+      number_export: 0,
+      number_import: numberImport,
+      price_import: priceIn,
+      price_export: priceOut,
+      colors: colorInfor(colors),
+    }).then(() => {
+      toast.success("Mày đã tạo thành công rồi đóa!");
+      resetInput();
+    });
   };
-  console.log(colors);
 
   const colorInfor = (arrColor: any) => {
     return arrColor.map((item: any) => {
@@ -98,114 +101,14 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
     });
   };
 
-  const handChangeColorName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setColors(
-      colors.map((item: IColors) => {
-        if (+item.id === +e.target.id) {
-          return {
-            ...item,
-            name_color: e.target.value,
-          };
-        }
-        return { ...item };
-      })
-    );
+  const handleChangeOpt = (value: any) => {
+    setSelectOpt(value);
   };
 
-  const renderInput = () => {
-    return colors.map((item: IColors) => {
-      return (
-        <React.Fragment key={item.id}>
-          <div className="col-md-8 form-group">
-            <span className="span-modal">Màu sản phẩm:</span>
-            <input
-              id={item.id}
-              type="text"
-              placeholder="Nhập màu"
-              className="form-control"
-              value={item.name_color}
-              onChange={(e: any) => {
-                let value = e.target.value;
-                let newColor = colors.map((val: IColors) => {
-                  if (item.id === val.id) {
-                    val.name_color = value;
-                  }
-                  return val;
-                });
-                setColors(newColor);
-              }}
-              // onKeyPress={(e) => {
-              //   handleEnter(e, item);
-              // }}
-            />
-            <div className="row">
-              {item.isShow && (
-                <React.Fragment>
-                  <div
-                    className="col-md-12 form-group"
-                    style={{ marginTop: "5px" }}
-                  >
-                    <span className="span-modal">Thông tin chi tiết</span>
-                  </div>
-                  <div
-                    className="col-md-12 form-group"
-                    style={{ marginTop: "5px" }}
-                  >
-                    <div className="row">
-                      {item.infors &&
-                        item.infors.length &&
-                        item.infors.map((val: IInfor, idx: any) => (
-                          <React.Fragment key={idx}>
-                            <div className="col-md-6">
-                              <span className="span-modal">Size</span>
-                              <input
-                                type="text"
-                                placeholder="Nhập size"
-                                className="form-control"
-                              />
-                            </div>
-
-                            <div className="col-md-6">
-                              <span className="span-modal">Số lượng</span>
-                              <input
-                                type="text"
-                                placeholder="Nhập số lượng"
-                                className="form-control"
-                              />
-                            </div>
-                          </React.Fragment>
-                        ))}
-
-                      <div className="col-md-12 d-flex justify-content-center">
-                        <Tooltip
-                          title="Thêm thông tin"
-                          enterDelay={500}
-                          leaveDelay={200}
-                        >
-                          <Button
-                            style={{ marginTop: "34px" }}
-                            shape="circle"
-                            icon={<AddIcon />}
-                            onClick={() => {
-                              handleClickAddInfor(item);
-                            }}
-                          />
-                        </Tooltip>
-                      </div>
-                    </div>
-                  </div>
-                </React.Fragment>
-              )}
-            </div>
-          </div>
-        </React.Fragment>
-      );
-    });
-  };
   return (
     <Dialog
       fullWidth={true}
-      fullScreen
+      maxWidth="md"
       open={open}
       aria-labelledby="max-width-dialog-title"
       scroll="body"
@@ -214,74 +117,77 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
           onClose();
         }
       }}
+      style={{
+        zIndex: 100,
+      }}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="card">
-          <div className="card-header">{/* <h4>Thêm sản phẩm </h4> */}</div>
           <div className="card-body">
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-4">
                 <div className="row">
                   <div className="col-md-12 form-group">
-                    <span className="span-modal">Tên sản phẩm: *</span>
-                    <input
-                      autoFocus
-                      type="text"
-                      {...register("name", { required: true })}
+                    <Input
+                      size="large"
+                      value={productName}
                       placeholder="Nhập tên sản phẩm"
-                      className="form-control"
+                      prefix={<span>Tên sản phẩm*</span>}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProductName(e.target.value)
+                      }
                     />
-                    {errors.name?.type === "required" && (
-                      <span style={{ color: "red" }}>
-                        Vui lòng nhập tên sản phẩm!
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    className="col-md-4 form-group"
-                    style={{ marginTop: "5px" }}
-                  >
-                    <span className="span-modal">Loại sản phẩm: *</span>
-                  </div>
-                  <div
-                    className="col-md-8 form-group"
-                    style={{ marginTop: "5px" }}
-                  >
-                    <select
-                      {...register("type", { required: true })}
-                      className="form-select"
-                    >
-                      <option value="shirt">Áo</option>
-                      <option value="trousers">Quần</option>
-                      <option value="sock">Vớ</option>
-                    </select>
                   </div>
                   <div
                     className="col-md-12 form-group"
                     style={{ marginTop: "5px" }}
                   >
-                    <span className="span-modal">Số lượng nhập hàng: *</span>
-                    <input
-                      type="text"
-                      placeholder="Nhập số lượng nhập hàng"
-                      className="form-control"
-                      {...register("number_import", { required: true })}
-                    />
-                    {errors.name?.type === "required" && (
-                      <span style={{ color: "red" }}>
-                        Số lượng nhập không được để trống!
-                      </span>
-                    )}
+                    <Input.Group compact>
+                      <Select
+                        size="large"
+                        style={{ width: "100%" }}
+                        defaultValue={selectOpt}
+                        onChange={handleChangeOpt}
+                        placeholder={
+                          <React.Fragment>
+                            <span style={{ color: "#000" }}>
+                              Chọn loại sản phẩm*
+                            </span>
+                          </React.Fragment>
+                        }
+                      >
+                        {options &&
+                          options.length &&
+                          options.map((val: any) => (
+                            <Option value={val.value} key={val.value}>
+                              {val.title}
+                            </Option>
+                          ))}
+                      </Select>
+                    </Input.Group>
                   </div>
                   <div
                     className="col-md-12 form-group"
                     style={{ marginTop: "5px" }}
                   >
-                    <span className="span-modal">Giá nhập vào:</span>
+                    <Input
+                      size="large"
+                      value={numberImport}
+                      placeholder="Nhập số lượng"
+                      prefix={<span>Số lượng nhập*</span>}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setNumberImport(e.target.value)
+                      }
+                    />
+                  </div>
+                  <div
+                    className="col-md-12 form-group"
+                    style={{ marginTop: "5px" }}
+                  >
                     <NumberFormat
                       thousandSeparator={true}
                       suffix={" ₫"}
-                      className="form-control"
+                      className="form-control price"
                       placeholder="Nhập giá lấy hàng"
                       value={priceIn}
                       onValueChange={(values: any) => {
@@ -294,11 +200,10 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
                     className="col-md-12 form-group"
                     style={{ marginTop: "5px" }}
                   >
-                    <span className="span-modal">Giá bán ra:</span>
                     <NumberFormat
                       thousandSeparator={true}
                       suffix={" ₫"}
-                      className="form-control"
+                      className="form-control price"
                       placeholder="Nhập giá bán hàng"
                       value={priceOut}
                       onValueChange={(values: any) => {
@@ -309,110 +214,8 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
                   </div>
                 </div>
               </div>
-              <div className="col-md-6">
+              <div className="col-md-8">
                 <div className="row">
-                  {/* {colors &&
-                    colors.length &&
-                    colors.map((item: IColors, idx: any) => (
-                      <React.Fragment key={idx}>
-                        <div className="col-md-8 form-group">
-                          <span className="span-modal">Màu sản phẩm:</span>
-                          <input
-                            id={item.id}
-                            type="text"
-                            placeholder="Nhập màu"
-                            className="form-control"
-                            onChange={handChangeColorName}
-                            onKeyPress={(e) => {
-                              handleEnter(e, item);
-                            }}
-                          />
-                          <div className="row">
-                            {item.isShow && (
-                              <React.Fragment>
-                                <div
-                                  className="col-md-12 form-group"
-                                  style={{ marginTop: "5px" }}
-                                >
-                                  <span className="span-modal">
-                                    Thông tin chi tiết
-                                  </span>
-                                </div>
-                                <div
-                                  className="col-md-12 form-group"
-                                  style={{ marginTop: "5px" }}
-                                >
-                                  <div className="row">
-                                    {item.infors &&
-                                      item.infors.length &&
-                                      item.infors.map(
-                                        (val: IInfor, idx: any) => (
-                                          <React.Fragment key={idx}>
-                                            <div className="col-md-6">
-                                              <span className="span-modal">
-                                                Size
-                                              </span>
-                                              <input
-                                                type="text"
-                                                placeholder="Nhập size"
-                                                className="form-control"
-                                              />
-                                            </div>
-
-                                            <div className="col-md-6">
-                                              <span className="span-modal">
-                                                Số lượng
-                                              </span>
-                                              <input
-                                                type="text"
-                                                placeholder="Nhập số lượng"
-                                                className="form-control"
-                                              />
-                                            </div>
-                                          </React.Fragment>
-                                        )
-                                      )}
-
-                                    <div className="col-md-12 d-flex justify-content-center">
-                                      <Tooltip
-                                        title="Thêm thông tin"
-                                        enterDelay={500}
-                                        leaveDelay={200}
-                                      >
-                                        <Button
-                                          style={{ marginTop: "34px" }}
-                                          shape="circle"
-                                          icon={<AddIcon />}
-                                          onClick={() => {
-                                            handleClickAddInfor(item);
-                                          }}
-                                        />
-                                      </Tooltip>
-                                    </div>
-                                  </div>
-                                </div>
-                              </React.Fragment>
-                            )}
-                          </div>
-                        </div>
-                      </React.Fragment>
-                    ))} */}
-                  {/* {renderInput()} */}
-                  {/* <div className="col-md-4 d-flex justify-content-center">
-                    <Tooltip
-                      title="Thêm màu sản phẩm"
-                      enterDelay={500}
-                      leaveDelay={200}
-                    >
-                      <Button
-                        style={{ marginTop: "34px" }}
-                        shape="circle"
-                        type="primary"
-                        icon={<AddIcon />}
-                        onClick={handleClickAddColor}
-                      />
-                    </Tooltip>
-                  </div> */}
                   <MutiColor colors={colors} setColors={setColors} />
                 </div>
               </div>
@@ -420,7 +223,12 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
           </div>
           <div className="card-footer">
             <div className="row " style={{ marginTop: "5px" }}>
-              <div className="col-md-12 d-flex justify-content-end">
+              <div className="col-md-6">
+                <span>
+                  Lưu ý: <i>Cần nhập những input có đánh dấu *</i>
+                </span>
+              </div>
+              <div className="col-md-6 d-flex justify-content-end">
                 <Button
                   type="primary"
                   icon={<CloseIcon />}
@@ -436,7 +244,6 @@ export default function ModalCreateProduct({ open, onClose }: IProps) {
                   type="primary"
                   icon={<AddBusinessIcon />}
                   size="large"
-                  //   typeof="submit"
                   onClick={handleSubmit(onSubmit)}
                 >
                   Tạo mới

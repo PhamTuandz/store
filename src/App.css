@@ -77,3 +77,10 @@
   box-shadow: none;
   outline: none;
 }
+
+.price::placeholder {
+  color: #000
+}
+.price {
+  border-radius: 2px;
+}
