@@ -61,4 +61,20 @@ export class AppHelpers {
       });
     }
   }
+  // const total: string = item?.products?.reduce(
+  //             (total: any, currentValue: any) =>
+  //               (total = total + currentValue.price_import),
+  //             0
+  //           );
+  static numberExport(arr: any[]) {
+    let numberEx: any = null;
+    arr.map((item: any) => {
+      item.infors.reduce((val: any, currentValue: any) => {
+        if (currentValue.sells === "") return;
+        numberEx = Number(val) + Number(currentValue.sells);
+        return numberEx;
+      }, 0);
+    });
+    return numberEx;
+  }
 }

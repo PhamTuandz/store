@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { makeStyles } from "@mui/styles";
 import * as _ from "lodash";
 import { TableCell, TableRow, TableSortLabel } from "@mui/material";

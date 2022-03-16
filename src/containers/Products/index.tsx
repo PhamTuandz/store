@@ -1,20 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable array-callback-return */
 import React, { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { makeStyles } from "@mui/styles";
-import { TableFooter, TableSortLabel, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { ColumnList, Data } from "./products.constants";
 import TableHeaderSort from "../../component/TableHeaderSort";
 import { Order } from "../../utils/helpers";
@@ -31,6 +26,9 @@ import { getDatabase, ref, remove, set } from "firebase/database";
 import ModalConfirm from "../../component/ModalConfirm";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { toast } from "react-toastify";
+// import FiberNewIcon from "@mui/icons-material/FiberNew";
+import ModalCreateType from "./components/ModalCreateType";
+import ModalSell from "./components/ModalSell";
 
 export const useStyles = makeStyles({
   root: {
@@ -67,14 +65,14 @@ export default function Products({ store, options }: any) {
   console.log(store);
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Data>("no");
+  const [orderBy, setOrderBy] = React.useState<keyof Data>("price_import");
   const [isOpenCreate, setIsOpenCreate] = useState<boolean>(false);
 
   const [products, setProducts] = React.useState<any>([]);
-  const [priceImport, setPriceImport] = React.useState<string>("");
-  const [priceExport, setPriceExport] = React.useState<string>("");
   const [open, setOpen] = React.useState<boolean>(false);
   const [isOpenConfirm, setIsOpenConfirm] = useState<boolean>(false);
+  const [isCreateTypes, setIsCreateTypes] = useState<boolean>(false);
+  const [isOpenSell, setIsOpenSell] = useState<boolean>(false);
 
   const [values, setValues] = useState<any>(null);
   const db = getDatabase();
@@ -85,50 +83,25 @@ export default function Products({ store, options }: any) {
     }
   }, [store]);
 
-  // useEffect(() => {
-  //   if (products && products.length) {
-  //     setPriceImport(
-  //       products
-  //         .map((item: any) => {
-  //           console.log(item);
-  //           const total: string = item?.products?.reduce(
-  //             (total: any, currentValue: any) =>
-  //               (total = total + currentValue.price_import),
-  //             0
-  //           );
-  //           return total;
-  //         })
-  //         ?.reduce((val: any) => {
-  //           return { ...val };
-  //         })
-  //     );
-  //     setPriceExport(
-  //       products
-  //         .map((item: any) => {
-  //           console.log(item);
-  //           const total: string = item?.products?.reduce(
-  //             (total: any, currentValue: any) =>
-  //               (total = total + currentValue.price_export),
-  //             0
-  //           );
-  //           return total;
-  //         })
-  //         ?.reduce((val: any) => {
-  //           return { ...val };
-  //         })
-  //     );
-  //   }
-  // }, [products]);
   const renderControl = () => {
     return (
-      <div className="container">
+      <div className="container-fluid">
         <div className="row " style={{ marginTop: "5px" }}>
           <div className="col-md-12 d-flex justify-content-end">
+            {/* <Button
+              type="ghost"
+              icon={<FiberNewIcon />}
+              size="large"
+              onClick={() => setIsCreateTypes(!isCreateTypes)}
+            >
+              Thêm loại sản phẩm
+            </Button> */}
             <Button
               type="primary"
               icon={<AddBusinessIcon />}
               size="large"
               onClick={() => setIsOpenCreate(true)}
+              className="mx-3"
             >
               Thêm sản phẩm
             </Button>
@@ -162,9 +135,12 @@ export default function Products({ store, options }: any) {
   const handleRemove = (value: any) => {
     setIsOpenConfirm(!isOpenConfirm);
     setValues(value);
-    console.log(value);
   };
-  console.log(products);
+
+  const handleSell = (value: any) => {
+    setIsOpenSell(!isOpenSell);
+    setValues(value);
+  };
   const renderTable = () => {
     if (!_.isEmpty(products) && products.length) {
       let tableData: any[] = AppHelpers.stableSort(
@@ -209,10 +185,7 @@ export default function Products({ store, options }: any) {
                       : "0"}
                   </TableCell>
                 );
-              } else if (
-                colId === "number_import" ||
-                colId === "number_export"
-              ) {
+              } else if (colId === "number_import") {
                 return (
                   <TableCell
                     key={colId}
@@ -267,6 +240,17 @@ export default function Products({ store, options }: any) {
                     />
                   </TableCell>
                 );
+              } else if (colId === "number_export") {
+                return (
+                  <TableCell
+                    key={colId}
+                    style={{ textAlign: "center", fontWeight: "600" }}
+                  >
+                    {AppHelpers.numberExport(row.colors)
+                      ? AppHelpers.numberExport(row.colors)
+                      : "0"}
+                  </TableCell>
+                );
               } else if (colId === "actions") {
                 return (
                   <TableCell
@@ -277,6 +261,7 @@ export default function Products({ store, options }: any) {
                       <button
                         className="btn__action"
                         style={{ color: "#3493e4" }}
+                        onClick={() => handleSell(row)}
                       >
                         <AddShoppingCartIcon />
                       </button>
@@ -435,6 +420,19 @@ export default function Products({ store, options }: any) {
           title="Mày có muốn xóa sản phẩm này không??????"
           text=""
           onChange={handleRemoveProduct}
+        />
+      )}
+      {isCreateTypes && (
+        <ModalCreateType
+          open={isCreateTypes}
+          onClose={() => setIsOpenCreate(!isCreateTypes)}
+        />
+      )}
+      {isOpenSell && (
+        <ModalSell
+          open={isOpenSell}
+          onClose={() => setIsOpenSell(!isOpenSell)}
+          prod={values}
         />
       )}
     </React.Fragment>

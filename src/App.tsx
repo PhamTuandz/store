@@ -24,7 +24,7 @@ function App() {
     onValue(ref(db, "store/"), (snapshot) => {
       const storeFirebase: any[] = snapshot.val();
       setStore(
-        storeFirebase && storeFirebase.length
+        !_.isEmpty(storeFirebase)
           ? Object.entries(storeFirebase)?.map(([key, item]) => {
               return { ...item, title: key };
             })
@@ -52,7 +52,6 @@ function App() {
         rtl={false}
         pauseOnFocusLoss
         draggable
-        pauseOnHover
       />
       <Products store={store} options={options} />
     </div>

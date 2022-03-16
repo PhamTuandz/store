@@ -81,6 +81,12 @@
 .price::placeholder {
   color: #000
 }
+
 .price {
   border-radius: 2px;
+}
+
+.span__infor {
+  font-size: 18px;
+  font-weight: 500;
 }
