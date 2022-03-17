@@ -62,7 +62,6 @@ export const useStyles = makeStyles({
 });
 
 export default function Products({ store, options }: any) {
-  console.log(store);
   const classes = useStyles();
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] = React.useState<keyof Data>("price_import");
@@ -82,7 +81,6 @@ export default function Products({ store, options }: any) {
       setProducts(store);
     }
   }, [store]);
-
   const renderControl = () => {
     return (
       <div className="container-fluid">
@@ -164,7 +162,11 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: "18px",
+                    }}
                   >
                     {value
                       ? AppHelpers.titleProduct(options, value)?.title
@@ -175,7 +177,12 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      color: "red",
+                      fontSize: "18px",
+                    }}
                   >
                     {row.number_import && row.number_export
                       ? AppHelpers.amountRemaining(
@@ -189,7 +196,12 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      color: "#0441d8",
+                      fontSize: "18px",
+                    }}
                   >
                     {value ? `${value}` : "0"}
                   </TableCell>
@@ -198,7 +210,11 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: "18px",
+                    }}
                   >
                     {value ? (
                       <NumberFormat
@@ -216,7 +232,11 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: "18px",
+                    }}
                   >
                     <NumberFormat
                       value={row.number_import * row.price_import}
@@ -230,7 +250,11 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: "18px",
+                    }}
                   >
                     <NumberFormat
                       value={row.number_export * row.price_export}
@@ -244,11 +268,14 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      color: "#009413",
+                      fontSize: "18px",
+                    }}
                   >
-                    {AppHelpers.numberExport(row.colors)
-                      ? AppHelpers.numberExport(row.colors)
-                      : "0"}
+                    {value ? value : "0"}
                   </TableCell>
                 );
               } else if (colId === "actions") {
@@ -305,7 +332,11 @@ export default function Products({ store, options }: any) {
                 return (
                   <TableCell
                     key={colId}
-                    style={{ textAlign: "center", fontWeight: "600" }}
+                    style={{
+                      textAlign: "center",
+                      fontWeight: "600",
+                      fontSize: "18px",
+                    }}
                   >
                     {value ? value : "-"}
                   </TableCell>

@@ -12,7 +12,7 @@ export default function InputSell({
     <Input
       size="large"
       value={sell}
-      placeholder="Nhập màu"
+      placeholder="Nhập SL bán"
       onChange={(e) => onChangeSell(e.target.value, id, index, idParent)}
       style={{ width: "55%" }}
     />

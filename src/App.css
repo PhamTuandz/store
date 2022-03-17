@@ -90,3 +90,13 @@
   font-size: 18px;
   font-weight: 500;
 }
+
+.ant-input[disabled] {
+  color: #000;
+  font-weight: 500
+}
+
+/* .bg {
+  background: url('./module/HH.png') no-repeat;
+  background-color: #cccccc;
+} */

@@ -13,6 +13,7 @@ import NumberFormat from "react-number-format";
 import { Input } from "antd";
 import { AppHelpers } from "../../../utils/helpers";
 import { toast } from "react-toastify";
+import * as _ from "lodash";
 
 interface IProps {
   open: boolean;
@@ -38,7 +39,7 @@ export default function ModalCreateProduct({ open, onClose, options }: IProps) {
     {
       id: 1,
       name_color: "",
-      infors: [{ id: 1, size: "", number: "" }],
+      infors: [{ id: 1, size: "", number: 0, sells: 0, sold: 0 }],
       isShow: false,
     },
   ]);
@@ -50,33 +51,25 @@ export default function ModalCreateProduct({ open, onClose, options }: IProps) {
   const [priceOut, setPriceOut] = useState<string>("");
   const [selectOpt, setSelectOpt] = useState<any>(options[1]?.value);
 
+  React.useEffect(() => {
+    if (!_.isEmpty(options)) {
+      setSelectOpt(options[1]?.value);
+    }
+  }, [selectOpt]);
   const resetInput = () => {
     setProductName("");
     setNumberImport("");
     setPriceIn("");
+    setPriceOut("");
     setSelectOpt(options[1]?.value);
     setColors([
       {
         id: 1,
         name_color: "",
-        infors: [{ id: 1, size: "", number: "" }],
+        infors: [{ id: 1, size: "", number: 0, sells: 0, sold: 0 }],
         isShow: false,
       },
     ]);
-  };
-
-  const handleClickAddInfor = (val: IColors) => {
-    setColors(
-      colors.map((item: IColors) => {
-        if (item.id === val.id) {
-          return {
-            ...item,
-            infors: [...item.infors, { size: "", number: "" }],
-          };
-        }
-        return { ...item };
-      })
-    );
   };
 
   const onSubmit = (data: any) => {

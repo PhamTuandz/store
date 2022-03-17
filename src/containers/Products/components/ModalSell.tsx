@@ -7,7 +7,7 @@ import InputSell from "./InputSell";
 import * as _ from "lodash";
 import { child, getDatabase, push, ref, update } from "firebase/database";
 import { toast } from "react-toastify";
-
+import logo from '../../../module/HH.png'
 interface IProps {
   open: boolean;
   onClose: () => void;
@@ -17,13 +17,15 @@ interface IProps {
 export default function ModalSell({ open, onClose, prod }: IProps) {
   const { colors } = prod;
   const [sell, setSell] = useState<any>([]);
+  const [id, setId] = useState<any>(null);
+  const [idParent, setIdParent] = useState<any>(null);
 
   useEffect(() => {
     if (!_.isEmpty(colors)) {
       setSell(
         colors.map((item: any) => {
           item.infors.map((val: any) => {
-            Object.assign(val, { sells: "" });
+            Object.assign(val, { sells: 0 });
           });
           return { ...item };
         })
@@ -31,6 +33,8 @@ export default function ModalSell({ open, onClose, prod }: IProps) {
     }
   }, [colors]);
   const onChangeSell = (sell: any, id: any, index: any, idParent: any) => {
+    setIdParent(idParent);
+    setId(id);
     setSell(
       colors.map((item: any) => {
         if (item.id === idParent) {
@@ -48,13 +52,51 @@ export default function ModalSell({ open, onClose, prod }: IProps) {
       })
     );
   };
-  
+
+  const resetData = () => {
+    setSell(
+      colors.map((item: any) => {
+        item.infors.map((val: any) => {
+          Object.assign(val, { sells: 0 });
+        });
+        return { ...item };
+      })
+    );
+    onClose();
+  };
+
   const handleSell = () => {
+    let temp: number = 0;
+    let sub: number = 0;
+    let total: number = 0;
     const db = getDatabase();
+    setSell(
+      colors.map((item: any) => {
+        const { infors } = item;
+        infors.map((pre: any) => {
+          temp = Number(pre.number) - Number(pre.sold);
+          sub = temp - Number(pre.sells);
+          if (sub < 0) return;
+          Object.assign(
+            pre,
+            { sells: 0 },
+            { sold: Number(pre.sells) + Number(pre.sold) }
+          );
+          total = total + Number(pre.sold);
+
+          return { pre };
+        });
+        return { ...item };
+      })
+    );
+    if (sub < 0) {
+      toast.warning("Có đủ hàng đâu mà bán như đúng rồi vậy??????");
+      return;
+    }
     update(ref(db, "store/" + prod.title), {
       name_products: prod.name_products,
       types: prod.types,
-      number_export: 0,
+      number_export: total,
       number_import: prod.number_import,
       price_import: prod.price_import,
       price_export: prod.price_export,
@@ -67,7 +109,7 @@ export default function ModalSell({ open, onClose, prod }: IProps) {
   return (
     <Dialog
       fullWidth={true}
-      maxWidth="xs"
+      maxWidth="sm"
       open={open}
       aria-labelledby="max-width-dialog-title"
       scroll="body"
@@ -80,7 +122,7 @@ export default function ModalSell({ open, onClose, prod }: IProps) {
         zIndex: 100,
       }}
     >
-      <div className="card">
+      <div className="card bg" style={{backgroundColor: `${logo}`}}>
         <div className="card-heard">
           <div className="card-title text-center" style={{ fontSize: "24px" }}>
             Thông tin sản phẩm
@@ -123,7 +165,12 @@ export default function ModalSell({ open, onClose, prod }: IProps) {
                                     <span>SL Kho: </span>
                                     <Input
                                       size="large"
-                                      value={val.number}
+                                      defaultValue={
+                                        Number(val.number) === 0
+                                          ? 0
+                                          : Number(val.number) -
+                                            Number(val.sold)
+                                      }
                                       style={{ width: "55%" }}
                                       disabled
                                     />
@@ -158,7 +205,7 @@ export default function ModalSell({ open, onClose, prod }: IProps) {
                 size="large"
                 danger
                 style={{ marginRight: "10px" }}
-                onClick={() => onClose()}
+                onClick={() => resetData()}
               >
                 Đóng
               </Button>

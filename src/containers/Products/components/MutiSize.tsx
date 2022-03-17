@@ -38,7 +38,7 @@ export default function MutiSize({
         <Input
           size="large"
           value={size}
-          placeholder="Nhập màu"
+          placeholder="Nhập size"
           style={{ marginTop: infors.id !== 1 ? "5px" : "0px" }}
           prefix={<span>Size:</span>}
           onChange={(e) => onChangeSize(e.target.value, index, id, infors.id)}
@@ -48,7 +48,7 @@ export default function MutiSize({
         <Input
           size="large"
           value={number}
-          placeholder="Nhập màu"
+          placeholder="Nhập SL"
           style={{ marginTop: infors.id !== 1 ? "5px" : "0px" }}
           prefix={<span>SL:</span>}
           onChange={(e) => onChangeNumber(e.target.value, index, id, infors.id)}

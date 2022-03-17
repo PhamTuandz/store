@@ -68,7 +68,7 @@ export default function MutiColor({ colors, setColors }: IMutiColor) {
           const { infors } = item;
           infors.map((pre: any, idx: any) => {
             if (pre.id === idChidren) {
-              Object.assign(pre, { number: number });
+              Object.assign(pre, { number: Number(number) });
             } else {
               return { pre };
             }
@@ -84,7 +84,7 @@ export default function MutiColor({ colors, setColors }: IMutiColor) {
       pre.concat({
         id: colors.length + 1,
         name_color: "",
-        infors: [{ id: 1, size: "", number: "" }],
+        infors: [{ id: 1, size: "", number: 0, sells: 0, sold: 0 }],
         isShow: false,
       })
     );
@@ -95,7 +95,9 @@ export default function MutiColor({ colors, setColors }: IMutiColor) {
     const infor = {
       id: infors.length + 1,
       size: "",
-      number: "",
+      number: 0,
+      sells: 0,
+      sold: 0,
     };
     infors.push(infor);
     setColors(

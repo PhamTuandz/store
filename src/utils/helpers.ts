@@ -68,13 +68,13 @@ export class AppHelpers {
   //           );
   static numberExport(arr: any[]) {
     let numberEx: any = null;
-    arr.map((item: any) => {
-      item.infors.reduce((val: any, currentValue: any) => {
-        if (currentValue.sells === "") return;
-        numberEx = Number(val) + Number(currentValue.sells);
-        return numberEx;
+    let temp: any[] = arr.map((item: any) => {
+      console.log(item);
+      return item.infors.reduce((val: any, currentValue: any) => {
+        return (numberEx = Number(val) + Number(currentValue.sold));
       }, 0);
     });
+    console.log(temp)
     return numberEx;
   }
 }
