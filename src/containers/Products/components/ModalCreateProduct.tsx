@@ -73,12 +73,26 @@ export default function ModalCreateProduct({ open, onClose, options }: IProps) {
   };
 
   const onSubmit = (data: any) => {
+    console.log(colors);
     const db = getDatabase();
+    let totaImp: number = 0;
+    setColors(
+      colors.map((item: any) => {
+        const { infors } = item;
+        infors.map((pre: any) => {
+          console.log(pre);
+          totaImp = totaImp + Number(pre.number);
+          return { pre };
+        });
+        return { ...item };
+      })
+    );
+   
     set(ref(db, "store/" + productName + `_${AppHelpers.generateUUIDV4()}`), {
       name_products: productName,
       types: selectOpt,
       number_export: 0,
-      number_import: numberImport,
+      number_import: totaImp,
       price_import: priceIn,
       price_export: priceOut,
       colors: colorInfor(colors),
@@ -159,7 +173,7 @@ export default function ModalCreateProduct({ open, onClose, options }: IProps) {
                       </Select>
                     </Input.Group>
                   </div>
-                  <div
+                  {/* <div
                     className="col-md-12 form-group"
                     style={{ marginTop: "5px" }}
                   >
@@ -172,7 +186,7 @@ export default function ModalCreateProduct({ open, onClose, options }: IProps) {
                         setNumberImport(e.target.value)
                       }
                     />
-                  </div>
+                  </div> */}
                   <div
                     className="col-md-12 form-group"
                     style={{ marginTop: "5px" }}
