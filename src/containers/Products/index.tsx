@@ -283,6 +283,9 @@ export default function Products({ store, options }: any) {
                   <TableCell
                     key={colId}
                     style={{ textAlign: "center", fontWeight: "600" }}
+                    className={
+                      row.number_export === +row.number_import ? "bg" : ""
+                    }
                   >
                     <Tooltip title="Bán" enterDelay={500} leaveDelay={200}>
                       <button

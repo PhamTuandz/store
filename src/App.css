@@ -96,7 +96,9 @@
   font-weight: 500
 }
 
-/* .bg {
-  background: url('./module/HH.png') no-repeat;
-  background-color: #cccccc;
-} */
+.bg {
+  background: url('./module/logo2.png') top left / 100px 50px;
+  background-repeat: no-repeat;
+  background-clip: border-box;
+  background-origin: padding-box;
+}
